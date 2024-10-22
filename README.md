@@ -1,2 +1,2 @@
 # NoorQuran IOS App
-# Created using SwiftUI
+Created using SwiftUI
