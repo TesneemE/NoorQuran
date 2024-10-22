@@ -1,4 +1,4 @@
 # NoorQuran IOS App
-##In progress
+## In progress
 Created using SwiftUI
 
