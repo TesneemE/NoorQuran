@@ -11,45 +11,136 @@ struct AyahDetailView: View {
     var ayah: Ayah
     var surahDetail: SurahDetail
     @ObservedObject var surahStore = SurahStore()
-    
+    @State private var recitationView = false
     @State private var translationText: String?
-    @State private var isLoading = true // Loading state
-    @State private var errorMessage: String? // Error message
+    @State private var isLoading = true
+    @State private var errorMessage: String?
+    @State private var whiteBoxHeight: CGFloat = 0 //for rec view box
+    @State private var count = 0 // count for button
+    let maxCount = 10
     
     var body: some View {
-        VStack(alignment: .center, spacing: 20) {
-            Text("Surah \(surahDetail.englishName) (\(surahDetail.name))")
-                .font(.title)
-                .fontWeight(.bold)
+        
+        ZStack {
+            LinearGradient(gradient: Gradient(colors: [Color("Green"), Color("AccentGreen")]), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)
             
-            Text("Ayah \(ayah.numberInSurah) of Surah \(surahDetail.number)")
-                .font(.headline)
-                .foregroundColor(.secondary)
-            
-            Text(ayah.text)
-                .font(.body)
-                .multilineTextAlignment(.center)
+            ScrollView {
+                VStack(alignment: .center, spacing: 20) {
+                    Text("Surah \(surahDetail.englishName) (\(surahDetail.name))")
+                        .font(.title2)
+                        .fontWeight(.bold)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(1)
+                        .scaledToFit()
+                        .padding()
+                    
+                    Text("Ayah \(ayah.numberInSurah) of Surah \(surahDetail.number)")
+                        .font(.headline)
+                        .foregroundColor(.secondary)
+                        .padding(.bottom, 10)
+
+                    // ayah text w/ overlay when recitationView is true
+                    ZStack {
+                                RoundedRectangle(cornerRadius: 15)
+                                    .fill(Color.white.opacity(0.8))
+                                    .shadow(radius: 5)
+                                    .overlay(
+                                        // tracking height of white box
+                                        GeometryReader { geometry in
+                                            Color.clear
+                                                .onAppear {
+                                                    // Store the height of the white box
+                                                    self.whiteBoxHeight = geometry.size.height
+                                                }
+                                        }
+                                    )
+
+                                // ayah Text
+                                HStack {
+                                    Spacer()
+                                    Text(ayah.text)
+                                        .font(.title3)
+                                        .multilineTextAlignment(.trailing)
+                                        .padding(.all)
+                                        .lineSpacing(5)
+                                }
+
+                                if recitationView {
+                                    Rectangle()
+                                        .fill(Color.black)
+                                        .frame(height: whiteBoxHeight)
+                                        .cornerRadius(10)
+                                        .padding(.all)
+                                }
+                            }
+                            .padding(.bottom, 20)
+                    
+              
+                    Divider()
+                        .padding(.horizontal, 20)
+                
+                    Button(action: {
+                        withAnimation {
+                            recitationView.toggle()
+                            if recitationView { startCounting() }
+                        }
+                    }) {
+                        Text(recitationView ? "Hide Recitation View" : "Practice Recitation")
+                            .padding()
+                            .background(Color("Pink").opacity(0.8))
+                            .foregroundColor(.white)
+                            .fontWeight(.bold)
+                            .cornerRadius(10)
+                    }
+
+                    if recitationView {
+                        Button(action: {
+                            incrementCount()
+                            
+                            if count >= maxCount {
+                                count = 0 //resets the count
+                                recitationView.toggle() //switches back
+                            }
+                        }) {
+                            Text("\(count)/\(maxCount)")
+                                .padding()
+                                .background(Color("Pink").opacity(0.8))
+                                .foregroundColor(.white)
+                                .fontWeight(.bold)
+                                .cornerRadius(10)
+                        }
+                        .disabled(count >= maxCount)
+                    }
+
+                    if isLoading {
+                        ProgressView("Loading translation...")
+                            .progressViewStyle(CircularProgressViewStyle())
+                            .padding()
+                    } else if let errorMessage = errorMessage {
+                        Text(errorMessage)
+                            .foregroundColor(.red)
+                            .padding()
+                    } else {
+                        VStack {
+                            Text("Translation")
+                            Text(translationText ?? "Translation not available")
+                                .font(.body)
+                                .padding()
+                                .background(RoundedRectangle(cornerRadius: 15).fill(Color("AccentPink").opacity(0.8)))
+                                .foregroundColor(.white)
+                                .fontWeight(.bold)
+                        }
+                    }
+                    
+                    Spacer()
+                }
                 .padding()
-            
-            if isLoading {
-                ProgressView("Loading translation...")
-            } else if let errorMessage = errorMessage {
-                Text(errorMessage)
-                    .foregroundColor(.red)
-            } else {
-                Text(translationText ?? "Translation not available")
-                    .font(.body)
-                    .multilineTextAlignment(.center)
-                    .padding()
+                .navigationBarTitle("Ayah Detail", displayMode: .inline)
+                .onAppear {
+                    fetchTranslation()
+                }
             }
-            
-            Spacer()
         }
-        .onAppear {
-            fetchTranslation()
-        }
-        .padding()
-        .navigationBarTitle("Ayah Detail", displayMode: .inline)
     }
     
     private func fetchTranslation() {
@@ -65,6 +156,16 @@ struct AyahDetailView: View {
                 }
             }
         }
+    }
+    
+    private func incrementCount() {
+        if count < maxCount {
+            count += 1
+        }
+    }
+    
+    private func startCounting() {
+        count = 0
     }
 }
 
@@ -89,4 +190,3 @@ struct AyahDetailView_Previews: PreviewProvider {
         AyahDetailView(ayah: testAyah, surahDetail: surahTest)
     }
 }
-

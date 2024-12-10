@@ -6,54 +6,77 @@
 //
 
 import SwiftUI
-//Text(currentHadith.englishNarrator)
-//Text(currentHadith.hadithEnglish)
-//    .padding()
-//    .background(RoundedRectangle(cornerRadius: 25).fill(Color.green.opacity(0.2)))
-////                        Text("Narrated by: \(currentHadith.englishNarrator)")
-//}
-//.padding(10)
-//.padding(.top)
-//.padding(.bottom)
-//.font(.headline)
-//.bold()
-//.background(RoundedRectangle(cornerRadius: 25).fill(Color.green.opacity(0.2)))
 
-struct AyahBookmarkView: View{
-@EnvironmentObject var bookmarkAyahStore: BookmarkAyahStore
+struct AyahBookmarkView: View {
+    @EnvironmentObject var bookmarkAyahStore: BookmarkAyahStore
+    
     var body: some View {
-        if bookmarkAyahStore.bookmarkedAyahs.isEmpty {
-            // Display a message when no data is available
-            Text("No bookmarked ayahs to display.")
-                .foregroundColor(.gray)
-                .font(.headline)
-                .multilineTextAlignment(.center)
-                .padding()
-        } else {
-            ScrollView {
-                ForEach(bookmarkAyahStore.bookmarkedAyahs) { ayah in
-                                VStack(alignment: .leading, spacing: 5) {
-                                    Text("Surah \(ayah.surah): \(ayah.surahName)")
+        ZStack {
+            LinearGradient(gradient: Gradient(colors: [Color("Green"), Color("AccentGreen")]), startPoint: .top, endPoint: .bottom)
+                .edgesIgnoringSafeArea(.all)
+            
+            if bookmarkAyahStore.bookmarkedAyahs.isEmpty {
+                Text("No bookmarked ayahs to display.")
+                    .foregroundColor(.black)
+                    .font(.headline)
+                    .multilineTextAlignment(.center)
+                    .padding()
+            } else {
+                ScrollView {
+                    LazyVStack(spacing: 15) {
+                        ForEach(bookmarkAyahStore.bookmarkedAyahs) { ayahs in
+                            VStack(alignment: .leading, spacing: 10) {
+                                HStack {
+                                    Text("Surah \(ayahs.surah): \(ayahs.surahName)")
                                         .font(.headline)
-                                    Text("Ayah \(ayah.ayah)")
+                                        .bold()
+                                        .foregroundColor(.white)
+                                    Spacer()
+                                    Text("Ayah \(ayahs.ayah)")
                                         .font(.subheadline)
                                         .foregroundColor(.secondary)
-                                    Text(ayah.text)
-                                        .font(.headline)
-                                        .background(RoundedRectangle(cornerRadius: 25).fill(Color.green.opacity(0.2)))
                                 }
-                                .padding(.vertical, 5)
-                    .padding(10)
-                    .padding(.top)
-                    .padding(.bottom)
-                    .font(.headline)
-                    .bold()
-                    .background(RoundedRectangle(cornerRadius: 25).fill(Color.green.opacity(0.2)))
+                                
+                                // ayah Text
+                                Text(ayahs.text)
+                                    .font(.body)
+                                    .bold()
+                                    .fontWeight(.medium)
+                                    .padding()
+                                    .foregroundColor(.black)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 15)
+                                            .fill(Color("AccentPink").opacity(0.8))
+                                    )
+                                Button(action: {
+                                    bookmarkAyahStore.toggleBookmark(for: ayahs)
+                                }) {
+                                    Image(systemName: bookmarkAyahStore.isBookmarked(surah: ayahs.surah, ayah: ayahs.ayah) ? "bookmark.fill" : "bookmark")
+                                        .foregroundColor(bookmarkAyahStore.isBookmarked(surah: ayahs.surah, ayah: ayahs.ayah) ? Color("Pink") : .gray)
+                                }
                             }
+                            .padding(15)
+                            .background(
+                                RoundedRectangle(cornerRadius: 20)
+                                    .fill(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [Color("AccentPink").opacity(0.8), Color("Pink").opacity(0.6)]),
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    )
+                            )
+                            .shadow(radius: 5)
                         }
                     }
+                    .padding(.top)
+                    .padding(.horizontal, 10)
                 }
             }
+        }
+    }
+}
+
 struct AyahBookmarkView_Previews: PreviewProvider {
     static var bookmarkStore: BookmarkAyahStore = {
         let store = BookmarkAyahStore()

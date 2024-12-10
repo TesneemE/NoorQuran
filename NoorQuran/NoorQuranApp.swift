@@ -6,21 +6,23 @@
 //
 
 import SwiftUI
-
 @main
 struct NoorQuranApp: App {
     @StateObject var memorizationStore = MemorizationStore()
     @StateObject var bookmarkAyahStore = BookmarkAyahStore()
     @StateObject var bookmarkHadithStore = BookmarkHadithStore()
-//    @StateObject var audioManager = AudioManager()
+    @StateObject private var audioManager = AudioManager()
+    
+    
     var body: some Scene {
         WindowGroup {
-           ContentView()
+            AppLoadingView()
                 .environmentObject(memorizationStore)
                 .environmentObject(bookmarkAyahStore)
                 .environmentObject(bookmarkHadithStore)
-//                .environmentObject(audioManager)
-            
+                .environmentObject(audioManager)
         }
     }
 }
+
+

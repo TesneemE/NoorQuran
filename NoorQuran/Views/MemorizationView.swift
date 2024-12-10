@@ -2,94 +2,127 @@
 //  MemorizationView.swift
 //  NoorQuran
 //
-//  Created by Tes Essa on 12/5/24.
+//  Created by Tes Essa on 12/2/24.
 //
-
-
-//import SwiftUI
-//
-//struct MemorizationView: View {
-//    @EnvironmentObject var memorization: MemorizationStore
-//    @Binding var showMemorization: Bool
-//    var body: some View {
-//        ZStack(alignment: .topTrailing) {
-//            Button(action: { showMemorization.toggle() }) {
-//                Image(systemName: "xmark.circle")
-//            }
-//            .font(.title)
-//            .padding()
-//
-//            VStack {
-//                Text("History")
-//                    .font(.title)
-//                    .padding()
-//
-//                Form {
-//                    ForEach(memorization.memorizedAyahs) { mem in
-//                        Section(
-//                            header:
-//                                Text(mem.dateMemorized.formatted(as: "MMM d"))
-//                                .font(.headline)) {
-//
-//                            HStack {
-//                                Text("Surah \(mem.surahName), Ayah \(mem.ayah)") // Use the correct property names here
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//struct MemorizationView_Previews: PreviewProvider {
-//  static var previews: some View {
-//    MemorizationView(showMemorization: .constant(true))
-//      .environmentObject(MemorizationStore())
-//  }
-//}
 import SwiftUI
+
+import Charts
+import Foundation
 
 struct MemorizationView: View {
     @EnvironmentObject var memorizationStore: MemorizationStore
     @Binding var showMemorization: Bool
-
+    @State private var selectedHistoryView = 1
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            Button(action: { showMemorization.toggle() }) {
-                Image(systemName: "xmark.circle")
-                    .font(.title)
-                    .padding()
-            }
+        ZStack {
+            LinearGradient(
+                gradient: Gradient(colors: [Color("AccentPink").opacity(0.8), Color("Pink").opacity(0.6)]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .edgesIgnoringSafeArea(.all)
 
-            NavigationView {
-                if memorizationStore.groupedAyahs.isEmpty {
-                    // Display a message when no data is available
-                    Text("No memorized ayahs to display.")
-                        .foregroundColor(.gray)
-                        .font(.headline)
-                        .multilineTextAlignment(.center)
-                        .padding()
-                } else {
-                    List {
-                        ForEach(memorizationStore.groupedAyahs.keys.sorted(by: >), id: \.self) { date in
-                            if let ayahs = memorizationStore.groupedAyahs[date], !ayahs.isEmpty {
-                                Section(header: Text(date, formatter: DateFormatter.shortDate)) {
-                                    ForEach(ayahs) { ayah in
-                                        VStack(alignment: .leading, spacing: 5) {
-                                            Text("Surah \(ayah.surah): \(ayah.surahName)")
-                                                .font(.headline)
-                                            Text("Ayah \(ayah.ayah)")
-                                                .font(.subheadline)
-                                                .foregroundColor(.secondary)
+            VStack {
+                HStack {
+                    Spacer()
+                    Button(action: { showMemorization.toggle() }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.title)
+                            .foregroundColor(.white)
+                            .padding()
+                    }
+                }
+
+                Spacer()
+                Picker(selection: $selectedHistoryView, label: Text("Bookmarks")){
+                    Text("Memorized Ayahs")
+                        .tag(1)
+                    Text("Charts")
+                        .tag(2)
+                }
+    
+                .pickerStyle(SegmentedPickerStyle())
+                .padding()
+               .colorMultiply(Color("AccentGreen"))
+
+                if selectedHistoryView == 1{
+                    NavigationStack {
+                        if memorizationStore.groupedAyahs.isEmpty {
+                            Text("No memorized ayahs to display.")
+                                .foregroundColor(.black)
+                                .font(.headline)
+                                .multilineTextAlignment(.center)
+                                .padding()
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(LinearGradient(
+                                            gradient: Gradient(colors: [Color("AccentPink").opacity(0.8), Color("Pink").opacity(0.6)]),
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        ))
+                                        .padding()
+                                )
+                        } else {
+                            ZStack {
+                                LinearGradient(
+                                    gradient: Gradient(colors: [Color("AccentPink").opacity(0.8), Color("Pink").opacity(0.6)]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                                .edgesIgnoringSafeArea(.all)
+                                
+                                List {
+                                    ForEach(memorizationStore.groupedAyahs.keys.sorted(by: >), id: \.self) { date in
+                                        if let ayahs = memorizationStore.groupedAyahs[date], !ayahs.isEmpty {
+                                            Section(header: Text(date, formatter: DateFormatter.shortDate).foregroundColor(.black)) {
+                                                ForEach(ayahs) { ayah in
+                                                    VStack(alignment: .leading, spacing: 5) {
+                                                        Text("Surah \(ayah.surah): \(ayah.surahName)")
+                                                            .font(.headline)
+                                                            .foregroundColor(.black)
+                                                            .bold()
+                                                        HStack {
+                                                            Text("Ayah \(ayah.ayah)")
+                                                                .font(.subheadline)
+                                                                .foregroundColor(.secondary)
+                                                            Spacer()
+                                                            Button(action: {
+                                                                memorizationStore.toggleMemorization(for: ayah)
+                                                            }) {
+                                                                Image(systemName: "checkmark.seal")
+                                                                    .foregroundColor(memorizationStore.isMemorized(surah: ayah.surah, ayah: ayah.ayah) ? Color("Pink") : .gray)
+                                                                    .font(.title3)
+                                                            }
+                                                            .buttonStyle(.plain)
+                                                        }
+                                                    }
+                                                    .padding()
+                                                    .contentShape(Rectangle())
+                                                    .listRowBackground(Color("AccentGreen"))
+                                                }
+                                            }
                                         }
-                                        .padding(.vertical, 5)
                                     }
                                 }
+                                .navigationTitle("Memorization History")
+                                .toolbarBackground(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [Color("AccentPink").opacity(0.8), Color("Pink").opacity(0.6)]),
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    ),
+                                    for: .navigationBar
+                                )
+                                .toolbarBackground(.visible, for: .navigationBar)
+                                .listStyle(PlainListStyle())
                             }
-                        }
-                    }
-                    .navigationTitle("Memorization History")
+                        } //end to else  here
+                    } //end to nav stack here
+                }
+                else
+                {
+                    BarChartWeekView()
+                        .environmentObject(memorizationStore)
                 }
             }
         }
@@ -103,6 +136,7 @@ extension DateFormatter {
         return formatter
     }()
 }
+
 
 struct MemorizationView_Previews: PreviewProvider {
         static var store: MemorizationStore = {

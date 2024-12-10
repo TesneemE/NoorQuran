@@ -24,7 +24,6 @@ struct Hadith: Codable {
     let hadithNumber: String
     let englishNarrator: String
     let hadithEnglish: String
-//    let hadithUrdu: String
     let hadithArabic: String
     let headingArabic: String?
 }

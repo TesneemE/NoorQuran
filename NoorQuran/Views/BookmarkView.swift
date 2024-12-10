@@ -14,25 +14,32 @@ struct BookmarkView: View {
 
 
     var body: some View {
-       VStack{
-           Text("Bookmarks")
-               .font(.title)
-//               .font(.system(size: 50))
-               .padding(20)
-            
-            Picker(selection: $selectedView, label: Text("Bookmarks")){
-                Text("Ayah Bookmarks")
-                    .tag(1)
-                Text("Hadith Bookmarks")
-                    .tag(2)
-            }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding()
+        ZStack {
+            LinearGradient(gradient: Gradient(colors: [Color("Green"), Color("AccentGreen")]), startPoint: .top, endPoint: .bottom).edgesIgnoringSafeArea(.all)
+            VStack{
+               Text("Bookmarks")
+                   .font(.largeTitle)
+    //               .font(.system(size: 50))
+                   .padding(20)
+                   .fontWeight(.bold)
+                   .background(Capsule().fill(LinearGradient(gradient: Gradient(colors: [Color("AccentPink").opacity(0.8), Color("Pink").opacity(0.6)]), startPoint: .top, endPoint: .bottom)))
+                   .foregroundColor(.white)
+                
+                Picker(selection: $selectedView, label: Text("Bookmarks")){
+                    Text("Ayah Bookmarks")
+                        .tag(1)
+                    Text("Hadith Bookmarks")
+                        .tag(2)
+                }
+    
+                .pickerStyle(SegmentedPickerStyle())
+                .padding()
+               .colorMultiply(Color("AccentPink"))
 
-           // Embed the selected view
-           ViewContent(selectedView: selectedView)
-               .frame(maxWidth: .infinity, maxHeight: .infinity) // Adjust for flexible layout
-       }
+               ViewContent(selectedView: selectedView)
+                   .frame(maxWidth: .infinity, maxHeight: .infinity)
+            }
+        }
 //       .navigationTitle("Bookmarks")
    }
 }

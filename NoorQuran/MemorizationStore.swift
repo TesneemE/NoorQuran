@@ -17,7 +17,26 @@ struct MemorizedAyah: Identifiable {
         "\(surah):\(ayah)"
     }
 }
+struct AyahsMemorizedWeekly: Identifiable {
+    let date: Date
+    let count: Int
+    var id: Date { date }
+}
 
+extension Date {
+    var previousSevenDays: [Date] {
+        let calendar = Calendar.current
+        var dates: [Date] = []
+    
+        for dayOffset in 0..<7 {
+            if let previousDay = calendar.date(byAdding: .day, value: -dayOffset, to: self) {
+                let startOfDay = calendar.startOfDay(for: previousDay)
+                dates.append(startOfDay)
+            }
+        }
+        return dates
+    }
+}
 class MemorizationStore: ObservableObject {
     @Published var memorizedAyahs: [MemorizedAyah] = []
     private let dataURL: URL
@@ -56,7 +75,7 @@ class MemorizationStore: ObservableObject {
         do {
             let data = try PropertyListSerialization.data(fromPropertyList: plistData, format: .binary, options: .zero)
             try data.write(to: dataURL, options: .atomic)
-            print("Saved data: \(plistData)")
+//            print("Saved data: \(plistData)")
         } catch {
             print("Failed to save data:", error.localizedDescription)
         }
@@ -82,11 +101,21 @@ class MemorizationStore: ObservableObject {
         }
     }
     
-    var groupedAyahs: [Date: [MemorizedAyah]] {
+    var groupedAyahs: [Date: [MemorizedAyah]] { //for grouping by date
         let grouped = Dictionary(grouping: memorizedAyahs) { ayah in
-            // Use only the date without time for grouping
             Calendar.current.startOfDay(for: ayah.dateMemorized)
         }
         return grouped
     }
+    func weeklyMemorizedAyahs() -> [AyahsMemorizedWeekly] {
+        let today = Date()
+        let lastSevenDays = today.previousSevenDays //extension for last 7 days
+        let grouped = self.groupedAyahs //groups by date
+
+        return lastSevenDays.map { date in  //then maps to diff struct for counting ayahs per day
+            let ayahsOnDate = grouped[date] ?? []
+            return AyahsMemorizedWeekly(date: date, count: ayahsOnDate.count)
+        }
+    }
 }
+

@@ -8,11 +8,10 @@
 import SwiftUI
 
 struct ContentView: View {
-//    @StateObject var memorizationStore = MemorizationStore()
-//    @StateObject var bookMark = MemorizationStore()
     @EnvironmentObject var bookmarkHadithStore: BookmarkHadithStore
     @EnvironmentObject var bookmarkAyahStore: BookmarkAyahStore
     @EnvironmentObject var memorizationStore: MemorizationStore
+    @EnvironmentObject var audioManager: AudioManager
     var body: some View {
         TabView {
             Group{
@@ -34,7 +33,7 @@ struct ContentView: View {
                     }
             }
             .toolbarBackground(.visible, for: .tabBar)
-            .toolbarBackground(.green, for: .tabBar)
+            .toolbarBackground(Color("Green"), for: .tabBar)
             .toolbarColorScheme(.dark, for: .tabBar)
         }
         
@@ -65,11 +64,21 @@ struct ContentView_Previews: PreviewProvider {
         ]
         return store
     }()
+    static var mockAudioManager: AudioManager = {
+        let manager = AudioManager()
+        manager.isPlaying = true
+        manager.totalTime = 180.0
+        manager.currentTime = 60.0 
+        return manager
+    }()
+
     static var previews: some View {
         ContentView()
             .environmentObject(bookmarkStore)
             .environmentObject(store)
             .environmentObject(bookmarkHStore)
+            .environmentObject(mockAudioManager)
+        
         
     }
 }
