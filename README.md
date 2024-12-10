@@ -1,4 +1,4 @@
 # NoorQuran IOS App
-## In progress
-Created using SwiftUI
+## Memorization based Quran APP
+Created using SwiftUI and RESTAPI
 
