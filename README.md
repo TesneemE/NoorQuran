@@ -1,10 +1,10 @@
 # NoorQuran IOS App
 ## Memorization based Quran App
-Created using SwiftUI and RESTAPI
-Credits to:
-### [Al Quran Cloud API](https://link-url-here.org](https://alquran.cloud/api))
-### [Hadith API](https://www.hadithapi.com/)
-### [Al Adhan API](https://link-url-here.org](https://aladhan.com/))
+## Created using SwiftUI and RESTAPI
+## Credits to:
+#### [Al Quran Cloud API](https://link-url-here.org](https://alquran.cloud/api))
+#### [Hadith API](https://www.hadithapi.com/)
+#### [Al Adhan API](https://link-url-here.org](https://aladhan.com/))
 
 ### Demo
 
