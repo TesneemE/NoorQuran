@@ -1,5 +1,15 @@
 # NoorQuran IOS App
-## Memorization based Quran and Hadith App created using SwiftUI and RESTAPI
+## Quran and Hadith App created using SwiftUI and RESTAPI
+## Features Include:
+#### Access to the entire Quran 
+#### Filtered searching of Surahs and Ayahs by name and number
+#### Ayah Audio Playback and Loop 
+#### Individual Ayah View for practicing Recitation
+#### Memorization Tracking and Weekly Charts
+#### Hadith of the Day
+#### Bookmarking for Ayah and Hadith
+#### Daily Prayer Times by User Location 
+
 ## Credits to:
 #### [Al Quran Cloud API](https://alquran.cloud/api)
 #### [Hadith API](https://www.hadithapi.com/)
